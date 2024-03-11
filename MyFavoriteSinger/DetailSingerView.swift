@@ -7,7 +7,13 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct DetailSingerView: View {
+    @Environment(\.modelContext) var context
+    @Environment(\.dismiss) var dismiss
+    @State private var editSinger = false
+    @State private var showingDeleteAlert = false
     var singer: Singer
     
     var body: some View {
@@ -17,7 +23,6 @@ struct DetailSingerView: View {
                     .foregroundStyle(.white)
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .fontWidth(.expanded)
                 Text("Votre chanson préféré est :")
                     .foregroundStyle(.white)
                     .fontWeight(.bold)
@@ -31,25 +36,47 @@ struct DetailSingerView: View {
                         .foregroundStyle(.white)
                         .font(.title)
                         .fontWeight(.bold)
-                        .fontWidth(.expanded)
-                }
-                NavigationLink {
-                    EditSingerView(singer: singer)
-                } label: {
-                    Text("Modifier")
-                        .font(.title3)
-                        .foregroundStyle(.black)
-                        .fontWeight(.semibold)
-                        .padding()
-                        .background(.yellow)
-                        .cornerRadius(12)
                 }
             }
-            .padding()
         }
-        
+        .toolbar {
+            Button {
+                showingDeleteAlert = true
+            } label: {
+                Image(systemName: "minus.circle")
+                    .foregroundColor(.red)
+                    .font(.system(size: 30))
+                    .fontWeight(.semibold)
+            }
+            Button {
+                editSinger = true
+            }label: {
+                Image(systemName: "square.and.pencil")
+                    .foregroundColor(.yellow)
+                    .font(.system(size: 30))
+                    .fontWeight(.semibold)
+            }
+        }
+        .sheet(isPresented: $editSinger) {
+            EditSingerView(singer: singer)
+                .presentationDetents([.medium])
+        }
+        .alert("Supprimer le chanteur", isPresented: $showingDeleteAlert) {
+            Button("Annuler", role: .cancel) { }
+            Button("Supprimer", role: .destructive) {
+                deleteSinger(singer: singer)
+                dismiss()
+            }
+        } message: {
+            Text("Êtes-vous sûr de vouloir supprimer \(singer.name) ? Cette action est irréversible.")
+        }
+    }
+    
+    private func deleteSinger(singer: Singer) {
+        context.delete(singer)
     }
 }
+
 
 //#Preview {
 //    DetailSingerView()

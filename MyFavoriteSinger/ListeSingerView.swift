@@ -14,7 +14,6 @@ struct ListeSingerView: View {
     @Environment(\.modelContext) var context
     
     var body: some View {
-        
         NavigationStack {
             VStack {
                 if singers.isEmpty{
@@ -27,28 +26,34 @@ struct ListeSingerView: View {
                         .fontWeight(.bold)
                         .fontWidth(.expanded)
                 }else{
-                    List{
-                        Section("Mes artistes") {
-                            ForEach(singers) { singer in
-                                NavigationLink {
-                                    DetailSingerView(singer: singer)
-                                } label: {
-                                    HStack{
-                                        Image(systemName: "mic.fill")
-                                            .foregroundStyle(.yellow)
-                                        Text(singer.name)
-                                    }
-                                    
+                    ScrollView {
+                        ForEach(singers) { singer in
+                            NavigationLink {
+                                DetailSingerView(singer: singer)
+                            } label: {
+                                HStack{
+                                    Image(systemName: "mic.fill")
+                                        .foregroundStyle(.yellow)
+                                    Text(singer.name)
+                                        .foregroundStyle(.white)
+                                    Spacer()
+                                    Image(systemName: "arrow.right")
                                 }
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .fontWidth(.expanded)
+                                .padding()
+                                
+                                
                             }
-                            .onDelete(perform: delete)
-                           
+                            Divider()
+                                .foregroundStyle(.yellow)
                         }
+                        
                     }
                 }
-        
             }
-            .navigationBarTitle("Chanteur", displayMode: .large)
+            .navigationBarTitle("Mes artistes", displayMode: .large)
             .toolbar {
                 Button {
                     createNewSong = true
@@ -62,15 +67,8 @@ struct ListeSingerView: View {
                 NewSingerView()
                     .presentationDetents([.medium])
             }
-            
         }
         .tint(.yellow)
-    }
-    private func delete(at offsets: IndexSet){
-        for offset in offsets {
-            let singer = singers[offset]
-            context.delete(singer)
-        }
     }
 }
 
